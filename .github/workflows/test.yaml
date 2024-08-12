@@ -1,0 +1,31 @@
+name: Save JSON Output on Demand
+
+on:
+  workflow_dispatch:
+
+jobs:
+  save-json:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Generate JSON Output
+      id: generate_json
+      run: |
+        echo '{ "message": "Hello, world!" }' > output.json
+
+    - name: Save JSON Output with Date
+      run: |
+        DATE=$(date +'%Y-%m-%d')
+        mv output.json "data.$DATE.json"
+        echo "Saved JSON as data.$DATE.json"
+
+    - name: Commit changes
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git add data.*.json
+        git commit -m "Save JSON output as data.$(date +'%Y-%m-%d').json"
+        git push
